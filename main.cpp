@@ -129,15 +129,19 @@ int main()
 		window.draw(text_restart);
 
 		if (restartGame) {
-			text_restart.setString("");
-			looseGame = false;
 			restartGame = false;
-			for (int i = 0; i < H; i++)
-				for (int j = 0; j < L; j++)
-					field[i][j] = 0;
-			music.setVolume(15);
-			text_loose.setFillColor(sf::Color::White);
-			text_loose.setString("" + std::to_string(bestresult));
+			if (looseGame) {
+				text_restart.setString("");
+				looseGame = false;
+				for (int i = 0; i < H; i++)
+					for (int j = 0; j < L; j++)
+						field[i][j] = 0;
+				music.setVolume(15);
+				text_loose.setFillColor(sf::Color::White);
+				text_loose.setString("" + std::to_string(bestresult));
+				x_score = 1.f;
+				score = 0;
+			}
 		}
 
 		// field render
@@ -204,8 +208,6 @@ int main()
 								if (bestresult < score)
 									bestresult = score;
 								music.setVolume(0);
-								x_score = 1.f;
-								score = 0;
 							}
 						}
 						spawn = mersenne() % 7 + 1;
