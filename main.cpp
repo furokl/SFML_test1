@@ -41,6 +41,7 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(240, 440), "*Tetris*");
 
 	// for move square
+	float bestresult = 0.f;			// max_score
 	float score = 0.f;				// score
 	float x_score = 1.f;			// multiplier
 	int spawn = mersenne() % 7 + 1;	// spawn
@@ -51,7 +52,8 @@ int main()
 	bool rotate = false;			// rotate
 	bool beginGame = true;			// for start
 	bool pauseGame = true;			// pause
-	bool loseGame = false;
+	bool looseGame = false;			// loose
+	bool restartGame = false;		// restart
 
 
 	float timer = 0.f;
@@ -69,9 +71,10 @@ int main()
 	sf::Font font;
 	font.loadFromFile("C:\\Tetris\\Redist\\SingleDayRegular.ttf");
 
-	sf::Text text, text2;
-	text.setFont(font);
-	text2.setFont(font);
+	sf::Text text_score, text_loose, text_restart;
+	text_score.setFont(font);
+	text_loose.setFont(font);
+	text_restart.setFont(font);
 
 	// load sound fx
 	sf::SoundBuffer sample;
@@ -84,7 +87,7 @@ int main()
 	sf::Music music;
 	music.openFromFile("C:\\Tetris\\Redist\\sosnin.ogg");
 	music.play();
-	music.setVolume(20);
+	music.setVolume(15);
 	music.setLoop(true);
 
 	while (window.isOpen()) {
@@ -98,15 +101,16 @@ int main()
 				window.close();
 			if (event.type == sf::Event::KeyPressed)
 				switch (event.key.code) {
-				case sf::Keyboard::Escape:	window.close();	break;
-				case sf::Keyboard::Left:	dx = -1;		break;
-				case sf::Keyboard::Right:	dx = 1;			break;
-				case sf::Keyboard::Up:		rotate = true;	break;
-				case sf::Keyboard::Down:	delay = 0.05f;	break;
-				case sf::Keyboard::A:		dx = -1;		break;
-				case sf::Keyboard::D:		dx = 1;			break;
-				case sf::Keyboard::W:		rotate = true;	break;
-				case sf::Keyboard::S:		delay = 0.05f;	break;
+				case sf::Keyboard::Escape:	window.close();			break;
+				case sf::Keyboard::Left:	dx = -1;				break;
+				case sf::Keyboard::Right:	dx = 1;					break;
+				case sf::Keyboard::Up:		rotate = true;			break;
+				case sf::Keyboard::Down:	delay = 0.05f;			break;
+				case sf::Keyboard::A:		dx = -1;				break;
+				case sf::Keyboard::D:		dx = 1;					break;
+				case sf::Keyboard::W:		rotate = true;			break;
+				case sf::Keyboard::S:		delay = 0.05f;			break;
+				case sf::Keyboard::R:		restartGame = true;		break;
 				}
 			if (event.type == sf::Event::KeyReleased)
 				switch (event.key.code) {
@@ -120,8 +124,22 @@ int main()
 		}
 		window.clear(sf::Color::White);
 		window.draw(sprite_background);
-		window.draw(text);
-		window.draw(text2);
+		window.draw(text_score);
+		window.draw(text_loose);
+		window.draw(text_restart);
+
+		if (restartGame) {
+			text_restart.setString("");
+			looseGame = false;
+			restartGame = false;
+			for (int i = 0; i < H; i++)
+				for (int j = 0; j < L; j++)
+					field[i][j] = 0;
+			music.setVolume(15);
+			text_loose.setFillColor(sf::Color::White);
+			text_loose.setString("" + std::to_string(bestresult));
+		}
+
 		// field render
 		for (int i = 0; i < H; i++)
 			for (int j = 0; j < L; j++) {
@@ -140,7 +158,7 @@ int main()
 		}
 
 		// when you dont lose
-		if (!loseGame) {
+		if (!looseGame) {
 			// when window is only open
 			if (pauseGame) {
 				// first figure
@@ -174,12 +192,20 @@ int main()
 						for (int i = 0; i < 4; i++) {
 							field[b[i].y][b[i].x] = color;
 							if (b[i].y <= 3) {
-								text2.setPosition(15, 5);
-								text2.setString("YOU LOSE :(");
-								text2.setFillColor(sf::Color::Red);
-								text2.setCharacterSize(42);
-								loseGame = true;
-								music.stop();
+								text_restart.setPosition(50, -1);
+								text_restart.setFillColor(sf::Color::Black);
+								text_restart.setCharacterSize(16);
+								text_restart.setString("press 'R' for restart...");
+								text_loose.setPosition(20, 5);
+								text_loose.setString("YOU LOSE :(");
+								text_loose.setFillColor(sf::Color::Red);
+								text_loose.setCharacterSize(42);
+								looseGame = true;
+								if (bestresult < score)
+									bestresult = score;
+								music.setVolume(0);
+								x_score = 1.f;
+								score = 0;
 							}
 						}
 						spawn = mersenne() % 7 + 1;
@@ -234,9 +260,9 @@ int main()
 			// end if pause
 		}
 		// end if lose
-		text.setPosition(55, 392);
-		text.setString("Score: " + std::to_string(score));
-		text.setCharacterSize(24);
+		text_score.setPosition(55, 392);
+		text_score.setString("Score: " + std::to_string(score));
+		text_score.setCharacterSize(24);
 		window.display();
 	}
 	return 0;
