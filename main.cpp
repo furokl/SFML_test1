@@ -1,9 +1,6 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
+#include "SFML/Graphics.hpp"
+#include "SFML/Audio.hpp"
 #include <random>
-
-using namespace sf;
-using namespace std;
 
 const int H = 18;			// High for work field
 const int L = 10;			// Length for work field
@@ -37,11 +34,11 @@ bool check()
 int main()
 {
 	// random
-	random_device rd;
-	mt19937 mersenne(rd());
+	std::random_device rd;
+	std::mt19937 mersenne(rd());
 
 	// window
-	RenderWindow window(VideoMode(240, 440), "*Tetris*");
+	sf::RenderWindow window(sf::VideoMode(240, 440), "*Tetris*");
 
 	// for move square
 	float score = 0.f;				// score
@@ -59,33 +56,33 @@ int main()
 
 	float timer = 0.f;
 	float delay = 0.3f;				// delay
-	Clock clock;
+	sf::Clock clock;
 
 	// load texture
-	Texture texture, backgroung;
-	texture.loadFromFile("D:\\FuroK\\Visual Studio\\Texture\\square160x20.png");
-	backgroung.loadFromFile("D:\\FuroK\\Visual Studio\\Texture\\fon.png");
+	sf::Texture texture, backgroung;
+	texture.loadFromFile("Ñ:\\Tetris\\Redist\\square160x20.png");
+	backgroung.loadFromFile("Ñ:\\Tetris\\Redist\\fon.png");
 
-	Sprite square(texture), sprite_background(backgroung);
+	sf::Sprite square(texture), sprite_background(backgroung);
 
 	// loaf font
-	Font font;
-	font.loadFromFile("D:\\FuroK\\Visual Studio\\Font\\SingleDayRegular.ttf");
+	sf::Font font;
+	font.loadFromFile("Ñ:\\Tetris\\Redist\\SingleDayRegular.ttf");
 
-	Text text, text2;
+	sf::Text text, text2;
 	text.setFont(font);
 	text2.setFont(font);
 
 	// load sound fx
-	SoundBuffer sample;
-	sample.loadFromFile("D:\\FuroK\\Visual Studio\\Sound\\pong.wav");
+	sf::SoundBuffer sample;
+	sample.loadFromFile("Ñ:\\Tetris\\Redist\\pong.wav");
 
-	Sound pong;
+	sf::Sound pong;
 	pong.setBuffer(sample);
 	pong.setVolume(20);
 
-	Music music;
-	music.openFromFile("D:\\FuroK\\Visual Studio\\Sound\\sosnin.ogg");
+	sf::Music music;
+	music.openFromFile("Ñ:\\Tetris\\Redist\\sosnin.ogg");
 	music.play();
 	music.setVolume(20);
 	music.setLoop(true);
@@ -95,34 +92,33 @@ int main()
 		clock.restart();
 		timer += time;
 
-		Event event;
+		sf::Event event;
 		while (window.pollEvent(event)) {
-			if (event.type == Event::Closed)
+			if (event.type == sf::Event::Closed)
 				window.close();
-			if (event.type == Event::KeyPressed)
+			if (event.type == sf::Event::KeyPressed)
 				switch (event.key.code) {
-				case Keyboard::Escape:	window.close();	break;
-				case Keyboard::Left:	dx = -1;		break;
-				case Keyboard::Right:	dx = 1;			break;
-				case Keyboard::Up:		rotate = true;	break;
-				case Keyboard::Down:	delay = 0.05f;	break;
-				case Keyboard::A:		dx = -1;		break;
-				case Keyboard::D:		dx = 1;			break;
-				case Keyboard::W:		rotate = true;	break;
-				case Keyboard::S:		delay = 0.05f;	break;
+				case sf::Keyboard::Escape:	window.close();	break;
+				case sf::Keyboard::Left:	dx = -1;		break;
+				case sf::Keyboard::Right:	dx = 1;			break;
+				case sf::Keyboard::Up:		rotate = true;	break;
+				case sf::Keyboard::Down:	delay = 0.05f;	break;
+				case sf::Keyboard::A:		dx = -1;		break;
+				case sf::Keyboard::D:		dx = 1;			break;
+				case sf::Keyboard::W:		rotate = true;	break;
+				case sf::Keyboard::S:		delay = 0.05f;	break;
 				}
-			if (event.type == Event::KeyReleased)
+			if (event.type == sf::Event::KeyReleased)
 				switch (event.key.code) {
-				case Keyboard::Down:	delay = 0.3f;	break;
-				case Keyboard::S:		delay = 0.3f;	break;
-			
+				case sf::Keyboard::Down:	delay = 0.3f;	break;
+				case sf::Keyboard::S:		delay = 0.3f;	break;	
 				}
-			if (event.type == Event::LostFocus)
+			if (event.type == sf::Event::LostFocus)
 				pauseGame = false;
-			if (event.type == Event::GainedFocus)
+			if (event.type == sf::Event::GainedFocus)
 				pauseGame = true;
 		}
-		window.clear(Color::White);
+		window.clear(sf::Color::White);
 		window.draw(sprite_background);
 		window.draw(text);
 		window.draw(text2);
@@ -130,14 +126,14 @@ int main()
 		for (int i = 0; i < H; i++)
 			for (int j = 0; j < L; j++) {
 				if (field[i][j] == 0) continue;
-				square.setTextureRect(IntRect((field[i][j] - 1) * size, 0, size, size));
+				square.setTextureRect(sf::IntRect((field[i][j] - 1) * size, 0, size, size));
 				square.setPosition(j * 20, i * 20);
 				square.move(20, 20);
 				window.draw(square);
 			}
 		// detail render
 		for (int i = 0; i < 4; i++) {
-			square.setTextureRect(IntRect((color - 1) * size, 0, size, size));
+			square.setTextureRect(sf::IntRect((color - 1) * size, 0, size, size));
 			square.setPosition(a[i].x * 20, a[i].y * 20);
 			square.move(20, 20);
 			window.draw(square);
@@ -180,9 +176,10 @@ int main()
 							if (b[i].y <= 3) {
 								text2.setPosition(15, 5);
 								text2.setString("YOU LOSE :(");
-								text2.setFillColor(Color::Red);
+								text2.setFillColor(sf::Color::Red);
 								text2.setCharacterSize(42);
 								loseGame = true;
+								music.stop();
 							}
 						}
 						spawn = mersenne() % 7 + 1;
@@ -238,7 +235,7 @@ int main()
 		}
 		// end if lose
 		text.setPosition(55, 392);
-		text.setString("Score: " + to_string(score));
+		text.setString("Score: " + std::to_string(score));
 		text.setCharacterSize(24);
 		window.display();
 	}
