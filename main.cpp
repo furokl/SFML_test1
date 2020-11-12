@@ -254,22 +254,22 @@ int main()
 						temp1++;
 				}
 				switch (temp1) {
-				case 4:	
-					pong.play();
-					x_score += 0.7777f;
-					score += x_score * 4;	break;
-				case 3:
-					pong.play();
-					x_score += 0.5555f;
-					score += x_score * 3;	break;
-				case 2:
-					pong.play();
-					x_score += 0.3333f;
-					score += x_score * 2;	break;
 				case 1:
 					pong.play();
 					x_score += 0.1111f;
 					score += x_score;		break;
+				case 2:
+					pong.play();
+					x_score += 0.3333f;
+					score += x_score * 2;	break;
+				case 3:
+					pong.play();
+					x_score += 0.5555f;
+					score += x_score * 3;	break;
+				case 4:	
+					pong.play();
+					x_score += 0.7777f;
+					score += x_score * 4;	break;
 				}
 
 				temp1 = 0;
