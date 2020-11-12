@@ -6,8 +6,8 @@ using namespace sf;
 using namespace std;
 
 
-const int H = 18;			// High for window
-const int L = 10;			// Length for window
+const int H = 18;			// High for work field
+const int L = 10;			// Length for work field
 
 int field[H][L] = { 0 };
 
