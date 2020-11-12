@@ -240,6 +240,7 @@ int main()
 
 				// delete tetranimo
 				int k = H - 1;
+				int temp1 = 0;
 				for (int i = k; i > 0; i--) {
 					int temp = 0;
 					for (int j = 0; j < L; j++) {
@@ -249,13 +250,29 @@ int main()
 					}
 					if (temp < L)
 						k--;
-					else {
-						pong.play();
-						x_score += 0.1111f;
-						score += 1 * x_score;
-					}
+					if (temp == L)
+						temp1++;
+				}
+				switch (temp1) {
+				case 4:	
+					pong.play();
+					x_score += 0.7777f;
+					score += x_score * 4;	break;
+				case 3:
+					pong.play();
+					x_score += 0.5555f;
+					score += x_score * 3;	break;
+				case 2:
+					pong.play();
+					x_score += 0.3333f;
+					score += x_score * 2;	break;
+				case 1:
+					pong.play();
+					x_score += 0.1111f;
+					score += x_score;		break;
 				}
 
+				temp1 = 0;
 				dx = 0;
 				rotate = 0;
 			}
