@@ -82,7 +82,7 @@ int main()
 	pong.setVolume(20);
 
 	sf::Music music;
-	music.openFromFile("Ñ:\\Tetris\\Redist\\sosnin.ogg");
+	music.openFromFile("C:\\Tetris\\Redist\\sosnin.ogg");
 	music.play();
 	music.setVolume(20);
 	music.setLoop(true);
