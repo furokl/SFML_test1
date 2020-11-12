@@ -37,7 +37,7 @@ int main()
 	std::random_device rd;
 	std::mt19937 mersenne(rd());
 
-	// window
+	// window 
 	sf::RenderWindow window(sf::VideoMode(240, 440), "*Tetris*");
 
 	// for move square
@@ -60,14 +60,14 @@ int main()
 
 	// load texture
 	sf::Texture texture, backgroung;
-	texture.loadFromFile("Ñ:\\Tetris\\Redist\\square160x20.png");
-	backgroung.loadFromFile("Ñ:\\Tetris\\Redist\\fon.png");
+	texture.loadFromFile("C:\\Tetris\\Redist\\square160x20.png");
+	backgroung.loadFromFile("C:\\Tetris\\Redist\\fon.png");
 
 	sf::Sprite square(texture), sprite_background(backgroung);
 
 	// loaf font
 	sf::Font font;
-	font.loadFromFile("Ñ:\\Tetris\\Redist\\SingleDayRegular.ttf");
+	font.loadFromFile("C:\\Tetris\\Redist\\SingleDayRegular.ttf");
 
 	sf::Text text, text2;
 	text.setFont(font);
@@ -75,7 +75,7 @@ int main()
 
 	// load sound fx
 	sf::SoundBuffer sample;
-	sample.loadFromFile("Ñ:\\Tetris\\Redist\\pong.wav");
+	sample.loadFromFile("C:\\Tetris\\Redist\\pong.wav");
 
 	sf::Sound pong;
 	pong.setBuffer(sample);
