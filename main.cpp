@@ -5,7 +5,6 @@
 using namespace sf;
 using namespace std;
 
-
 const int H = 18;			// High for work field
 const int L = 10;			// Length for work field
 
@@ -126,6 +125,7 @@ int main()
 		window.clear(Color::White);
 		window.draw(sprite_background);
 		window.draw(text);
+		window.draw(text2);
 		// field render
 		for (int i = 0; i < H; i++)
 			for (int j = 0; j < L; j++) {
@@ -182,7 +182,6 @@ int main()
 								text2.setString("YOU LOSE :(");
 								text2.setFillColor(Color::Red);
 								text2.setCharacterSize(42);
-								window.draw(text2);
 								loseGame = true;
 							}
 						}
