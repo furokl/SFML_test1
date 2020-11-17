@@ -1,12 +1,15 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Audio.hpp"
 #include <random>
+#include <thread>	
+#include <chrono>	
+
+std::random_device rd;
+std::mt19937 mersenne(rd());
 
 const int H = 18;			// High for work field
 const int L = 10;			// Length for work field
-
 int field[H][L] = { 0 };
-
 int figures[7][4] =
 {
 	1, 3, 5, 7,		// |	
@@ -17,47 +20,38 @@ int figures[7][4] =
 	3, 5, 6, 7,		// L'
 	2, 3, 4, 5,		// []
 };
-
 struct Point {
 	int x, y;
 }	a[4], b[4];
-
-bool check()
-{
+bool check(){
 	for (int i = 0; i < 4; i++)
 		if (a[i].x < 0 || a[i].x >= L || a[i].y >= H)	return 0;
 		else if (field[a[i].y][a[i].x])					return 0;
 
 	return 1;
 }
+float bestresult = 0.f;			// max_score
+float score = 0.f;				// score
+float x_score = 1.f;			// multiplier
+int spawn = mersenne() % 7 + 1;	// spawn
+int dx = 0;						// move		
+int n = mersenne() % 7;			// type
+int color = mersenne() % 8 + 1;	// color
+int size = 20;					// size texture (20x20)
+bool rotate = false;			// rotate
+bool beginGame = true;			// for start
+bool pauseGame = false;			// pause
+bool looseGame = false;			// loose
+bool restartGame = false;		// restart
+bool muteMusic = false;			// mute music
+float timer = 0.f;
+float delay = 0.3f;				// delay
 
 int main()
 {
-	// random
-	std::random_device rd;
-	std::mt19937 mersenne(rd());
-
 	// window 
 	sf::RenderWindow window(sf::VideoMode(240, 440), "*Tetris*");
 
-	// for move square
-	float bestresult = 0.f;			// max_score
-	float score = 0.f;				// score
-	float x_score = 1.f;			// multiplier
-	int spawn = mersenne() % 7 + 1;	// spawn
-	int dx = 0;						// move		
-	int n = mersenne() % 7;			// type
-	int color = mersenne() % 8 + 1;	// color
-	int size = 20;					// size texture (20x20)
-	bool rotate = false;			// rotate
-	bool beginGame = true;			// for start
-	bool pauseGame = true;			// pause
-	bool looseGame = false;			// loose
-	bool restartGame = false;		// restart
-
-
-	float timer = 0.f;
-	float delay = 0.3f;				// delay
 	sf::Clock clock;
 
 	// load texture
@@ -87,8 +81,11 @@ int main()
 	sf::Music music;
 	music.openFromFile("C:\\Tetris\\Redist\\sosnin.ogg");
 	music.play();
-	music.setVolume(15);
 	music.setLoop(true);
+
+	sf::Music looseMusic;
+	looseMusic.openFromFile("C:\\Tetris\\Redist\\SektorGaza-Bomj.ogg");
+
 
 	while (window.isOpen()) {
 		float time = clock.getElapsedTime().asSeconds();
@@ -111,16 +108,27 @@ int main()
 				case sf::Keyboard::W:		rotate = true;			break;
 				case sf::Keyboard::S:		delay = 0.05f;			break;
 				case sf::Keyboard::R:		restartGame = true;		break;
+				case sf::Keyboard::M:		
+					muteMusic ? muteMusic = 0 : muteMusic = 1; 		break;
 				}
 			if (event.type == sf::Event::KeyReleased)
 				switch (event.key.code) {
 				case sf::Keyboard::Down:	delay = 0.3f;	break;
 				case sf::Keyboard::S:		delay = 0.3f;	break;	
 				}
-			if (event.type == sf::Event::LostFocus)
-				pauseGame = false;
-			if (event.type == sf::Event::GainedFocus)
+			if (event.type == sf::Event::LostFocus) {
 				pauseGame = true;
+				if (!looseGame)
+					if (!muteMusic)
+						music.setVolume(3);
+			}
+			if (event.type == sf::Event::GainedFocus) {
+				pauseGame = false;
+				if (!looseGame)
+					if (!muteMusic)
+						music.setVolume(15);
+			}
+
 		}
 		window.clear(sf::Color::White);
 		window.draw(sprite_background);
@@ -128,6 +136,7 @@ int main()
 		window.draw(text_loose);
 		window.draw(text_restart);
 
+		// restart game
 		if (restartGame) {
 			restartGame = false;
 			if (looseGame) {
@@ -136,7 +145,10 @@ int main()
 				for (int i = 0; i < H; i++)
 					for (int j = 0; j < L; j++)
 						field[i][j] = 0;
-				music.setVolume(15);
+				if(!muteMusic){
+					music.setVolume(15);	
+					looseMusic.stop();
+				}
 				text_loose.setFillColor(sf::Color::White);
 				text_loose.setString("" + std::to_string(bestresult));
 				x_score = 1.f;
@@ -164,7 +176,9 @@ int main()
 		// when you dont lose
 		if (!looseGame) {
 			// when window is only open
-			if (pauseGame) {
+			if (!pauseGame) {
+				!muteMusic ? music.setVolume(15) : music.setVolume(0);
+
 				// first figure
 				if (beginGame) {
 					beginGame = false;
@@ -204,10 +218,14 @@ int main()
 								text_loose.setString("YOU LOSE :(");
 								text_loose.setFillColor(sf::Color::Red);
 								text_loose.setCharacterSize(42);
+								if (!muteMusic) {
+									looseMusic.play();
+									looseMusic.setVolume(15);
+								}
+								music.setVolume(0);
 								looseGame = true;
 								if (bestresult < score)
 									bestresult = score;
-								music.setVolume(0);
 							}
 						}
 						spawn = mersenne() % 7 + 1;
